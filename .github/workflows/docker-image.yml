@@ -19,6 +19,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.FILE_ENV }}" > .env
+
       - name: Build Docker image
         run: |
           docker build -t nguyenybin2015/bill-ocr-admin-panel-api:latest .
@@ -35,13 +39,10 @@ jobs:
 
             docker stop bill-ocr-admin-panel-api || true
             docker rm bill-ocr-admin-panel-api || true
-            
 
             docker rmi nguyenybin2015/bill-ocr-admin-panel-api:latest || true
-            
 
             docker pull nguyenybin2015/bill-ocr-admin-panel-api:latest
-            
 
-            docker run -it --rm --name bill-ocr-admin-panel-api -p 3002:3000 -d nguyenybin2015/bill-ocr-admin-panel-api:latest
+            docker run -it --rm --name bill-ocr-admin-panel-api --env-file .env -p 3002:3000 -d nguyenybin2015/bill-ocr-admin-panel-api:latest
           EOF
