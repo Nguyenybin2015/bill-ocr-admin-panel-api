@@ -1,0 +1,47 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t nguyenybin2015/bill-ocr-admin-panel-api:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push nguyenybin2015/bill-ocr-admin-panel-api:latest
+
+      - name: SSH into VPS and Deploy
+        env:
+          VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} << 'EOF'
+
+            docker stop bill-ocr-admin-panel-api || true
+            docker rm bill-ocr-admin-panel-api || true
+            
+
+            docker rmi nguyenybin2015/bill-ocr-admin-panel-api:latest || true
+            
+
+            docker pull nguyenybin2015/bill-ocr-admin-panel-api:latest
+            
+
+            docker run -it --rm --name bill-ocr-admin-panel-api -p 3001:3000 -d nguyenybin2015/bill-ocr-admin-panel-api:latest
+          EOF
