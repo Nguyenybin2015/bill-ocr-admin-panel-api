@@ -42,13 +42,24 @@ jobs:
           VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
         run: |
           sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} << 'EOF'
+          
+            APP_NAME="bill-ocr-admin-panel-api"
+            ENV_DIR="/.env/$APP_NAME"
 
-            docker stop bill-ocr-admin-panel-api || true
-            docker rm bill-ocr-admin-panel-api || true
+            mkdir -p "$ENV_DIR"
 
-            docker rmi nguyenybin2015/bill-ocr-admin-panel-api:latest || true
+            cd "$ENV_DIR"
 
-            docker pull nguyenybin2015/bill-ocr-admin-panel-api:latest
+            if [ ! -f .env ]; then
+              echo "${{ secrets.FILE_ENV }}" > .env
+            fi
+            
+            docker stop $APP_NAME || true
+            docker rm $APP_NAME || true
 
-            docker run -it --rm --name bill-ocr-admin-panel-api --env-file .env -p 3002:3000 -d nguyenybin2015/bill-ocr-admin-panel-api:latest
+            docker rmi nguyenybin2015/$APP_NAME:latest || true
+
+            docker pull nguyenybin2015/$APP_NAME:latest
+
+            docker run -it --rm --name $APP_NAME --env-file .env -p 3002:3000 -d nguyenybin2015/$APP_NAME:latest
           EOF
