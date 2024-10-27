@@ -26,8 +26,8 @@ jobs:
       - name: Create ECDSA key files
         run: |
           mkdir -p ./keys
-          echo "${{ secrets.ECDSA_SECRET }}" > ./keys/ecdsa.key
-          echo "${{ secrets.ECDSA_PUBLIC }}" > ./keys/ecdsa.pub
+          echo "${{ secrets.ECDSA_SECRET }}" > ./ecdsa.key
+          echo "${{ secrets.ECDSA_PUBLIC }}" > ./ecdsa.pub
 
       - name: Build Docker image
         run: |
