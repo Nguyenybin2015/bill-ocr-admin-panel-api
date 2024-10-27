@@ -23,6 +23,12 @@ jobs:
         run: |
           echo "${{ secrets.FILE_ENV }}" > .env
 
+      - name: Create ECDSA key files
+        run: |
+          mkdir -p ./keys
+          echo "${{ secrets.ECDSA_SECRET }}" > ./keys/ecdsa.key
+          echo "${{ secrets.ECDSA_PUBLIC }}" > ./keys/ecdsa.pub
+
       - name: Build Docker image
         run: |
           docker build -t nguyenybin2015/bill-ocr-admin-panel-api:latest .
